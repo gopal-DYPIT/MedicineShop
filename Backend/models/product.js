@@ -3,11 +3,13 @@ const mongoose = require('mongoose');
 // Define the product schema
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  description: { type: String, required: true },
-  price: { type: Number, required: true },
-  stock: { type: Number, required: true }, // Quantity in stock
-  category: { type: String, required: true }, // Category of the product
   image: { type: String }, // URL for product image
+  description: { type: String, required: true },
+  type: { type: String, required: true },
+  brand: { type: String }, // URL for brand image
+  category: { type: String, required: true }, // Category of the product
+  price: { type: Number, required: true },
+  discount: {type: Number},
 });
 
 // Export the Product model
