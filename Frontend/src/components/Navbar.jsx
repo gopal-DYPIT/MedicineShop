@@ -58,7 +58,7 @@ function Navbar({ onSearch }) {
             How to order medicines
           </Link>
           <Link
-            to="/"
+            to="/contact"
             className="text-black text-base font-lato mx-4 hover:text-blue-600 hove:none transition duration-300 ease-in-out"
           >
             Contact us

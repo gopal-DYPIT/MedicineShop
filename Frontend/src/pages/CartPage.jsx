@@ -28,23 +28,23 @@ const CartPage = () => {
         <p className="text-center text-gray-500">Your cart is empty.</p>
       ) : (
         <div className="space-y-4">
-          {cart.map((item) => (
+          {cart.map((item, index) => (
             <div
-              key={item.productId._id}
+              key={index}
               className="flex items-center border p-4 rounded-md"
             >
-              {/* Small Image */}
               <img
-                src={item.productId.image} // Ensure the API includes an image URL
-                alt={item.productId.name}
+                src={item?.productId?.image || "placeholder.jpg"} // Fallback image
+                alt={item?.productId?.name || "Unnamed product"}
                 className="w-16 h-16 object-cover rounded mr-4"
               />
-              {/* Product Details */}
               <div className="flex-1">
-                <h2 className="font-bold text-lg">{item.productId.name}</h2>
-                <p className="text-gray-600">Quantity: {item.quantity}</p>
+                <h2 className="font-bold text-lg">
+                  {item?.productId?.name || "Unknown Product"}
+                </h2>
+                <p className="text-gray-600">Quantity: {item?.quantity || 0}</p>
                 <p className="text-blue-600 font-semibold">
-                  Price: Rs.{item.productId.price}
+                  Price: Rs.{item?.productId?.price || "N/A"}
                 </p>
               </div>
             </div>
