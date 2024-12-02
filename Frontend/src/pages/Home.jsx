@@ -6,11 +6,14 @@ import HomeAdvantageSection from "../components/HomeDetailsSection";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [userId, setUserId] = useState("test-user"); // Hardcoded userId for simplicity
   const [searchQuery, setSearchQuery] = useState("");
+  const { isAuthenticated, loginWithPopup, user } = useAuth0(); 
+
 
   useEffect(() => {
     // Fetch products from backend
@@ -34,9 +37,14 @@ const Home = () => {
   };
 
   const addToCart = async (productId) => {
+    if (!isAuthenticated) {
+      // Redirect to login if user is not authenticated
+      await loginWithPopup(); // Trigger the Auth0 login
+      return;
+    }
     try {
       await axios.post("http://localhost:5000/api/cart/add", {
-        userId: userId,
+        userId: user?.sub,
         productId: productId,
         quantity: 1,
       });
@@ -48,7 +56,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl mt-20">
         <div className="px-8">
           {/* Search Bar */}
           <form
@@ -89,17 +97,19 @@ const Home = () => {
           </h1>
           {/* SwiperCards Slider Cards  */}
           <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
+            modules={[Navigation, Pagination,Autoplay]}
             navigation={{
               nextEl: ".swiper-button-next",
               prevEl: ".swiper-button-prev",
             }}
-            pagination={{ clickable: true }}
-            autoplay={{ delay: 3000 }}
+            pagination={{
+              clickable: true, // Enables clickable pagination dots
+            }}
+            className="product-carousel relative px-4 text-sm flex-grow w-4/5"
+            autoplay={{ delay: 4000 }}
             spaceBetween={10} // Reduced space between cards
             slidesPerView={4} // Reduced the number of cards visible at once
             loop={true}
-            className="product-carousel relative px-4 text-sm size-5/6 "
           >
             {products.map((product) => (
               <SwiperSlide key={product._id}>

@@ -89,7 +89,7 @@ const Checkout = () => {
             </div>
           </div>
         ))}
-        <h3 className="text-xl mt-4">Total Amount: ₹{totalAmount}</h3>
+        <h3 className="text-xl mt-4">Total Amount: ₹{totalAmount.toFixed(2)}</h3>
         <button
           onClick={handlePayment}
           className="bg-green-500 text-white p-2 rounded mt-4 transition transform duration-300 ease-in-out hover:bg-green-600 hover:scale-105"
