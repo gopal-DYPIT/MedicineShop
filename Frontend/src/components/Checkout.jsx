@@ -4,69 +4,76 @@ import axios from "axios";
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
-  const [userId, setUserId] = useState("test-user"); // Hardcoded userId for now
+  const [userId, setUserId] = useState("test-user"); // Replace with dynamic userId
 
   useEffect(() => {
-    // Fetch the cart items for the logged-in user
-    axios
-      .get(`http://localhost:5000/api/cart/${userId}`)
-      .then((response) => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/cart/${userId}`);
         const cart = response.data;
-        const totalAmount = cart.items.reduce(
+
+        // Calculate total amount
+        const calculatedTotal = cart.items.reduce(
           (sum, item) => sum + item.productId.price * item.quantity,
           0
         );
+
         setCartItems(cart.items);
-        setTotalAmount(totalAmount);
-      })
-      .catch((err) => console.error("Failed to fetch cart:", err));
+        setTotalAmount(calculatedTotal);
+      } catch (error) {
+        console.error("Failed to fetch cart:", error);
+      }
+    };
+
+    fetchCartItems();
   }, [userId]);
 
-  const handlePayment = () => {
-    // Create the order
-    axios
-      .post("http://localhost:5000/api/orders/create", { userId })
-      .then((response) => {
-        const { orderId, totalAmount } = response.data;
-        // Start Razorpay payment
-        const options = {
-          key: "YOUR_RAZORPAY_KEY", // Replace with your Razorpay key
-          amount: totalAmount * 100, // Convert to paise (1 INR = 100 paise)
-          currency: "INR",
-          name: "Your Store Name",
-          description: "Payment for Medicine Order",
-          image: "https://example.com/logo.png", // Optional logo
-          handler: function (response) {
-            // After successful payment, update the order status
-            axios
-              .post("http://localhost:5000/api/orders/payment-success", {
-                paymentId: response.razorpay_payment_id,
-                orderId: orderId,
-              })
-              .then(() => {
-                alert("Payment successful!");
-                // Redirect or clear cart, etc.
-              })
-              .catch((err) => alert("Payment failed"));
-          },
-          prefill: {
-            name: "John Doe",
-            email: "john@example.com",
-            contact: "9876543210",
-          },
-          theme: {
-            color: "#F37254",
-          },
-        };
+  const handlePayment = async () => {
+    try {
+      // Create the order
+      const response = await axios.post("http://localhost:5000/api/orders/create", { userId });
+      const { orderId, totalAmount } = response.data;
 
-        const rzp1 = new window.Razorpay(options);
-        rzp1.open();
-      })
-      .catch((err) => console.error("Failed to create order:", err));
+      // Initialize Razorpay payment
+      const options = {
+        key: "YOUR_RAZORPAY_KEY", // Replace with your Razorpay key
+        amount: totalAmount * 100, // Convert to paise (1 INR = 100 paise)
+        currency: "INR",
+        name: "Your Store Name",
+        description: "Payment for Medicine Order",
+        image: "https://example.com/logo.png", // Optional logo
+        handler: function (response) {
+          // Handle successful payment
+          axios
+            .post("http://localhost:5000/api/orders/payment-success", {
+              paymentId: response.razorpay_payment_id,
+              orderId: orderId,
+            })
+            .then(() => {
+              alert("Payment successful!");
+              // Clear cart or redirect to order confirmation page
+            })
+            .catch((err) => alert("Failed to update payment status"));
+        },
+        prefill: {
+          name: "John Doe",
+          email: "john@example.com",
+          contact: "9876543210",
+        },
+        theme: {
+          color: "#F37254",
+        },
+      };
+
+      const rzp1 = new window.Razorpay(options);
+      rzp1.open();
+    } catch (error) {
+      console.error("Failed to create order:", error);
+    }
   };
 
   return (
-    <div className="p-4">
+    <div className="p-24">
       <h1 className="text-center text-3xl mb-4">Checkout</h1>
       <div>
         <h2 className="text-xl">Items in your cart</h2>

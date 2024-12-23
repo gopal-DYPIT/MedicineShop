@@ -1,16 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import cartImage from "../assets/cart.png";
 import icon from "../assets/icon.png";
 import { useAuth0 } from "@auth0/auth0-react";
 
 function Navbar() {
-  const { user, loginWithPopup, logout, isAuthenticated } = useAuth0();
+  const { user, loginWithPopup, logout, isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!isAuthenticated || !user) return;
+
+      try {
+        const token = await getAccessTokenSilently();
+        const userRoles = user?.["https://dev-nu5x8yo5712d4hqt.us.auth0.com/roles"] || [];
+        setIsAdmin(userRoles.includes("admin"));
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
+    checkAdminRole();
+  }, [isAuthenticated, user, getAccessTokenSilently]);
 
   return (
     <nav className="bg-[#fdf2f2] p-4 fixed top-0 left-0 w-full z-50 shadow-md">
       <div className="container mx-32 flex justify-between items-center">
-        {/* Flex container for Logo and Search Bar */}
         <div className="flex items-center">
           {/* Logo */}
           <img src={icon} alt="Icon" className="w-6 h-6" />
@@ -25,7 +41,7 @@ function Navbar() {
         {/* Links */}
         <div className="mx-60 flex items-center">
           <Link
-            to="/admin"
+            to="/infoOrder"
             className="text-black text-base font-lato mx-4 hover:text-blue-600 transition duration-300 ease-in-out"
           >
             How to order medicines
@@ -38,6 +54,14 @@ function Navbar() {
           </Link>
           {isAuthenticated ? (
             <>
+              {isAdmin && (
+                <Link
+                  to="/admin-dashboard"
+                  className="text-black text-base font-lato mx-4 hover:text-blue-600 transition duration-300 ease-in-out"
+                >
+                  Admin Dashboard
+                </Link>
+              )}
               {/* Profile Button */}
               <Link
                 to="/profile"
@@ -46,12 +70,12 @@ function Navbar() {
                 Profile
               </Link>
               {/* Logout Button */}
-              <button
+              {/* <button
                 onClick={() => logout({ returnTo: window.location.origin })}
                 className="text-black text-base font-lato mx-4 hover:text-blue-600 transition duration-300 ease-in-out"
               >
                 Logout
-              </button>
+              </button> */}
               {/* Cart Icon */}
               <Link
                 to="/cart"

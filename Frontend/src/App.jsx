@@ -9,6 +9,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import ContactUs from "./pages/Contact";
 import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute";  // Import PrivateRoute component
+import OrderMedicine from "./components/OrderMedicine";
 
 function App() {
   return (
@@ -32,6 +33,10 @@ function App() {
         <Route
           path="/profile"
           element={<PrivateRoute element={Profile} />}
+        />
+        <Route
+          path="/infoOrder"
+          element={<PrivateRoute element={OrderMedicine} />}
         />
         <Route path="/contact" element={<ContactUs />} />
       </Routes>
