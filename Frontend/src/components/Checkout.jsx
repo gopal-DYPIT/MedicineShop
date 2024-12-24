@@ -4,20 +4,17 @@ import axios from "axios";
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
-  const [userId, setUserId] = useState("test-user"); // Replace with dynamic userId
+  const [userId, setUserId] = useState("test-user"); 
 
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/cart/${userId}`);
         const cart = response.data;
-
-        // Calculate total amount
         const calculatedTotal = cart.items.reduce(
           (sum, item) => sum + item.productId.price * item.quantity,
           0
         );
-
         setCartItems(cart.items);
         setTotalAmount(calculatedTotal);
       } catch (error) {
@@ -30,20 +27,18 @@ const Checkout = () => {
 
   const handlePayment = async () => {
     try {
-      // Create the order
       const response = await axios.post("http://localhost:5000/api/orders/create", { userId });
       const { orderId, totalAmount } = response.data;
 
-      // Initialize Razorpay payment
       const options = {
-        key: "YOUR_RAZORPAY_KEY", // Replace with your Razorpay key
-        amount: totalAmount * 100, // Convert to paise (1 INR = 100 paise)
+        key: "YOUR_RAZORPAY_KEY",
+        amount: totalAmount * 100, 
         currency: "INR",
         name: "Your Store Name",
         description: "Payment for Medicine Order",
-        image: "https://example.com/logo.png", // Optional logo
+        image: "https://example.com/logo.png", 
         handler: function (response) {
-          // Handle successful payment
+         
           axios
             .post("http://localhost:5000/api/orders/payment-success", {
               paymentId: response.razorpay_payment_id,
@@ -51,7 +46,6 @@ const Checkout = () => {
             })
             .then(() => {
               alert("Payment successful!");
-              // Clear cart or redirect to order confirmation page
             })
             .catch((err) => alert("Failed to update payment status"));
         },
@@ -84,7 +78,7 @@ const Checkout = () => {
           >
             {/* Small Image */}
             <img
-              src={item.productId.image} // Ensure the API includes an image URL
+              src={item.productId.image}
               alt={item.productId.name}
               className="w-16 h-16 object-cover rounded mr-4"
             />

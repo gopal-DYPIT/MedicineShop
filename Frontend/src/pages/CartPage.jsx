@@ -1,33 +1,38 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react"; // Import Auth0 hook
+import { auth } from "../services/firebase"; // Firebase auth import
 
 const CartPage = () => {
   const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
-  const { user, isAuthenticated } = useAuth0(); // Get user details from Auth0
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch cart data only if the user is authenticated
-    if (isAuthenticated && user?.sub) {
-      const userId = user.sub; // Auth0 provides a unique ID as `sub`
+    const user = auth.currentUser;
+    if (user) {
+      const userId = user.uid;
       axios
         .get(`http://localhost:5000/api/cart/${userId}`)
         .then((response) => {
           setCart(response.data?.items || []);
+          setLoading(false);  // Set loading to false after data is fetched
         })
         .catch((err) => {
           setError("Failed to fetch cart");
+          setLoading(false);  // Also set loading to false in case of an error
           console.error("Failed to fetch cart:", err);
         });
+    } else {
+      setLoading(false);  // If user is not authenticated, stop loading
     }
-  }, [isAuthenticated, user]);
+  }, []);
 
   const handleDelete = (productId) => {
-    if (isAuthenticated && user?.sub) {
-      const userId = user.sub;
+    const user = auth.currentUser;
+    if (user) {
+      const userId = user.uid;
       axios
         .delete(`http://localhost:5000/api/cart/remove`, { data: { userId, productId } })
         .then(() => {
@@ -41,22 +46,25 @@ const CartPage = () => {
   };
 
   const handleQuantityChange = (productId, quantity) => {
-    if (quantity < 1 || !isAuthenticated || !user?.sub) return;
+    if (quantity < 1) return;
 
-    const userId = user.sub;
-    axios
-      .put(`http://localhost:5000/api/cart/update`, { userId, productId, quantity })
-      .then(() => {
-        setCart((prevCart) =>
-          prevCart.map((item) =>
-            item.productId._id === productId ? { ...item, quantity } : item
-          )
-        );
-      })
-      .catch((err) => {
-        setError("Failed to update quantity");
-        console.error("Failed to update quantity:", err);
-      });
+    const user = auth.currentUser;
+    if (user) {
+      const userId = user.uid;
+      axios
+        .put(`http://localhost:5000/api/cart/update`, { userId, productId, quantity })
+        .then(() => {
+          setCart((prevCart) =>
+            prevCart.map((item) =>
+              item.productId._id === productId ? { ...item, quantity } : item
+            )
+          );
+        })
+        .catch((err) => {
+          setError("Failed to update quantity");
+          console.error("Failed to update quantity:", err);
+        });
+    }
   };
 
   const handleCheckout = () => {
@@ -64,7 +72,7 @@ const CartPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-24">
+    <div className="container min-h-screen mx-auto p-24">
       <h1 className="text-center text-3xl mb-6">Your Cart</h1>
       {error && <p className="text-red-500 text-center">{error}</p>}
       {cart.length === 0 ? (

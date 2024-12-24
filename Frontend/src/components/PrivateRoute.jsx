@@ -1,12 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
+import { auth } from "../services/firebase"; // Import the Firebase auth module
 
 const PrivateRoute = ({ element: Component, ...rest }) => {
-  const { isAuthenticated, isLoading } = useAuth0();
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setIsAuthenticated(true); // User is authenticated
+      } else {
+        setIsAuthenticated(false); // User is not authenticated
+      }
+      setLoading(false); // Done loading
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show loading indicator while checking auth state
   }
 
   // If the user is not authenticated, redirect to the login page

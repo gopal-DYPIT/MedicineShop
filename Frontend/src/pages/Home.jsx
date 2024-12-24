@@ -1,21 +1,30 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import HomeAdvantageSection from "../components/HomeDetailsSection";
+import { auth, db } from "../services/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import LoginModal from "../components/LoginModel";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { useAuth0 } from "@auth0/auth0-react";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const { isAuthenticated, loginWithPopup, user } = useAuth0();
-  const [isAdmin, setIsAdmin] = useState(false); // State to check if user is admin
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Fetch products from backend
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+      if (user) {
+        checkAdminRole(user.uid);
+      }
+    });
+
     axios
       .get("http://localhost:5000/api/products")
       .then((response) => {
@@ -23,10 +32,17 @@ const Home = () => {
       })
       .catch((err) => console.error(err));
 
-    if (user && user.permissions?.includes("read:admin_dashboard")) {
-      setIsAdmin(true); 
+    return () => unsubscribe();
+  }, []);
+
+  const checkAdminRole = async (uid) => {
+    try {
+      const userDoc = await getDoc(doc(db, "users", uid));
+      setIsAdmin(userDoc.exists() ? userDoc.data()?.isAdmin || false : false);
+    } catch (error) {
+      console.error("Error checking admin role:", error);
     }
-  }, [user]);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -39,13 +55,13 @@ const Home = () => {
   };
 
   const addToCart = async (productId) => {
-    if (!isAuthenticated) {
-      await loginWithPopup();
+    if (!user) {
+      setShowLoginModal(true);
       return;
     }
     try {
       await axios.post("http://localhost:5000/api/cart/add", {
-        userId: user?.sub,
+        userId: user.uid,
         productId: productId,
         quantity: 1,
       });
@@ -211,7 +227,11 @@ const Home = () => {
           </button>
         </div>
       )}
-
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50">
+          <LoginModal onClose={() => setShowLoginModal(false)} />
+        </div>
+      )}{" "}
       <HomeAdvantageSection />
     </div>
   );
