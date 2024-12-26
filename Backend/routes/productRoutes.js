@@ -2,11 +2,39 @@ const express = require('express');
 const Product = require('../models/product');
 const router = express.Router();
 
-// GET route to fetch all products
+// GET route to fetch all products with search functionality
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find();
-    res.json(products);  // Return products directly as an array
+    const { search } = req.query;
+    let query = {};
+
+    // If search parameter exists, create a search query
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },          // Case-insensitive name search
+          { description: { $regex: search, $options: 'i' } },   // Case-insensitive description search
+          { category: { $regex: search, $options: 'i' } },      // Case-insensitive category search
+          { manufacturer: { $regex: search, $options: 'i' } }   // Case-insensitive manufacturer search
+        ]
+      };
+    }
+
+    const products = await Product.find(query);
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// GET route to fetch a single product by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json(product);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -17,25 +45,10 @@ router.post('/', async (req, res) => {
   const product = new Product(req.body);
   try {
     await product.save();
-    res.status(201).json(product);  // Return the newly created product
+    res.status(201).json(product);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
-
-// router.get('/search', async (req, res) => {
-//   const { query } = req.query; // Retrieve the search query from request
-//   try {
-//     const products = await Product.find({
-//       $or: [
-//         { name: { $regex: query, $options: 'i' } }, // Case-insensitive name match
-//         { description: { $regex: query, $options: 'i' } }, // Case-insensitive description match
-//       ],
-//     });
-//     res.status(200).json(products);
-//   } catch (err) {
-//     res.status(500).json({ error: 'Failed to search products' });
-//   }
-// });
 
 module.exports = router;

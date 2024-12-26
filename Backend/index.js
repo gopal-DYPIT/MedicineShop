@@ -18,6 +18,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const cartRoutes = require('./routes/cartRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const prescriptionRoutes = require('./routes/prescriptionRoutes');
+const partnerRoutes = require('./routes/partnerRoutes');
 
 
 // Use the routes
@@ -26,6 +27,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
+app.use("/api/partner", partnerRoutes);
 
 app.get('/',(req, res)=>{
   res.send("Backend Running Successfully")
