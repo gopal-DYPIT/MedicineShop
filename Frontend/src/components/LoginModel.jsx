@@ -173,6 +173,7 @@ function LoginModal({ onClose }) {
                 <button
                   onClick={handleVerifyOtp}
                   className="bg-emerald-600 w-full flex gap-1 items-center justify-center py-2.5 text-white rounded"
+                  disabled={otp.length !== 6 || loading}
                 >
                   {loading && <CgSpinner size={20} className="mt-1 animate-spin" />}
                   <span>Verify OTP</span>

@@ -96,7 +96,7 @@ const CartPage = () => {
                     onClick={() =>
                       handleQuantityChange(item.productId._id, item.quantity - 1)
                     }
-                    className="bg-gray-300 text-gray-700 px-2 py-1 rounded hover:bg-gray-400"
+                    className="bg-gray-300 text-gray-700 px-2 py-1 rounded hover:bg-red-400"
                   >
                     -
                   </button>
@@ -105,7 +105,7 @@ const CartPage = () => {
                     onClick={() =>
                       handleQuantityChange(item.productId._id, item.quantity + 1)
                     }
-                    className="bg-gray-300 text-gray-700 px-2 py-1 rounded hover:bg-gray-400"
+                    className="bg-gray-300 text-gray-700 px-2 py-1 rounded hover:bg-green-400"
                   >
                     +
                   </button>

@@ -32,12 +32,19 @@ router.post('/add', async (req, res) => {
 router.get('/:userId', async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.params.userId }).populate('items.productId');
+    if (!cart) {
+      // Return an empty cart if none exists
+      return res.status(200).json({ items: [] });
+    }
     res.status(200).json(cart);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch cart' });
   }
 });
+
+
+
 
 // Remove an item from the cart
 router.delete('/remove', async (req, res) => {

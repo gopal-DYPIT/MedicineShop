@@ -12,6 +12,7 @@ import PrivateRoute from "./components/PrivateRoute"; // Import PrivateRoute com
 import OrderMedicine from "./components/OrderMedicine";
 import MedicineDetails from "./pages/MedicineDetails";
 import JoinAsStorePartner from "./pages/JoinAsStorePartner";
+// import BrowseMedicines from "./pages/BrowseMedicines";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -45,6 +46,8 @@ function App() {
         />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/join-partner" element={<JoinAsStorePartner />} />
+        <Route path="/medicine/:id" element={<MedicineDetails />} />
+        {/* <Route path="/all-medicines" element={<BrowseMedicines />} /> */}
       </Routes>
       <Footer />
     </Router>

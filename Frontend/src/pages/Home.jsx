@@ -92,11 +92,11 @@ const Home = () => {
           Your Partner in Affordable Healthcare
         </h1>
         <div className="space-x-4">
-          <Link to="/products" className="hover:underline">
+          {/* <Link to="/all-medicines" className="hover:underline">
           <button className="bg-[#d1f3e0] text-[#444444]  px-6 py-2 rounded-full hover:bg-[#4CAF50]">
             Browse Medicines
           </button>
-          </Link>
+          </Link> */}
           <Link to="/infoOrder">
           <button className="bg-[#d1f3e0] text-[#444444] px-6 py-2 rounded-full hover:bg-[#4CAF50]">
             Upload Prescription

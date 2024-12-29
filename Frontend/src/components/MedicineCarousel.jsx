@@ -87,7 +87,7 @@ const MedicineCarousel = ({ products, addToCart }) => {
       </Swiper>
 
       {/* Custom Navigation */}
-      <div
+      {/* <div
         className="swiper-button-next pr-56 pt-48 absolute top-1/2 right-0 transform -translate-y-1/2 z-10 text-gray-700"
         aria-label="Next slide"
       >
@@ -124,7 +124,7 @@ const MedicineCarousel = ({ products, addToCart }) => {
             d="M15 19l-7-7 7-7"
           />
         </svg>
-      </div>
+      </div> */}
     </div>
   );
 };
