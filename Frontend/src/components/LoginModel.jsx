@@ -68,15 +68,28 @@ function LoginModal({ onClose }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await confirmationResult.confirm(otp);
-      toast.success('Login successful!');
+      const userCredential = await confirmationResult.confirm(otp);
+      const user = userCredential.user;
+  
+      // Simulate user role fetching (fetch from backend in production)
+      const fetchedUser = {
+        id: user.uid,
+        phone: user.phoneNumber,
+        role: user.phoneNumber === "+911234567890" ? "admin" : "user", // Example logic
+      };
+  
+      localStorage.setItem("user", JSON.stringify(fetchedUser));
+  
+      toast.success("Login successful!");
       onClose();
       setLoading(false);
     } catch (error) {
-      console.error('Error verifying OTP:', error);
+      console.error("Error verifying OTP:", error);
+      toast.error("Error verifying OTP. Please try again.");
       setLoading(false);
     }
   };
+  
 
   // Cleanup reCAPTCHA when logging out
   const cleanupRecaptcha = () => {
@@ -120,7 +133,7 @@ function LoginModal({ onClose }) {
             <img
               src={CompanyIcon}
               alt="Company Logo"
-              className="w-32 h-10 mx-auto block"
+              className="w-32 h-12 mx-auto block"
             />
 
             {!showOtp ? (
@@ -182,7 +195,7 @@ function LoginModal({ onClose }) {
             )}
           </div>
 
-          <div className="text-sm text-gray-500 mt-2">
+          <div className="pl-6 text-sm text-gray-500 mt-2">
             By clicking, I accept the{" "}
             <span className="text-blue-600 hover:underline cursor-pointer">
               Terms of Service

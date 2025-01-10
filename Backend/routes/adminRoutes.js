@@ -73,6 +73,31 @@ router.get('/products', async (req, res) => {
   }
 });
 
+router.post("/products", async (req, res) => {
+  try {
+    // Create a new product with the data sent from the frontend
+    const newProduct = new Product({
+      name: req.body.name,
+      image: req.body.image,  // Image URL
+      description: req.body.description,
+      type: req.body.type,
+      brand: req.body.brand,  // Brand URL
+      category: req.body.category,
+      price: req.body.price,
+      discount: req.body.discount || 0,  // Default to 0 if no discount provided
+    });
+
+    // Save the new product to the database
+    await newProduct.save();
+
+    // Respond with the newly created product
+    res.status(201).json(newProduct);
+  } catch (error) {
+    console.error("Error creating product:", error);
+    res.status(500).json({ message: "Error creating product" });
+  }
+});
+
 // Delete a product (Only for Admin)
 router.delete('/products/:id', async (req, res) => {
   try {
