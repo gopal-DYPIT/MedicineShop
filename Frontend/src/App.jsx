@@ -22,7 +22,9 @@ function AppContent() {
   // Simulate fetching user role from local storage or API
   useEffect(() => {
     // You should fetch user data from your authentication system (e.g., backend)
-    const fetchedUser = JSON.parse(localStorage.getItem('user')); // Replace with actual user fetching logic
+    const fetchedUser = JSON.parse(localStorage.getItem('user'));
+    // console.log(fetchedUser);
+     // Replace with actual user fetching logic
     setUser(fetchedUser);
     
     // Redirect admins from accessing non-admin routes

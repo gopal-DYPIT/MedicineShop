@@ -69,13 +69,14 @@ function LoginModal({ onClose }) {
     setLoading(true);
     try {
       const userCredential = await confirmationResult.confirm(otp);
+      console.log(userCredential);
       const user = userCredential.user;
   
       // Simulate user role fetching (fetch from backend in production)
       const fetchedUser = {
         id: user.uid,
         phone: user.phoneNumber,
-        role: user.phoneNumber === "+911234567890" ? "admin" : "user", // Example logic
+        role: user.phoneNumber === "+918788171162" ? "admin" : "user", // Example logic
       };
   
       localStorage.setItem("user", JSON.stringify(fetchedUser));

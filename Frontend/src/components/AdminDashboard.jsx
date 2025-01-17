@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import { useNavigate } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
+
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("manageProducts"); // Default section
@@ -33,13 +35,22 @@ const AdminDashboard = () => {
   }, []);
 
   const handleLogout = () => {
-    // Clear authentication data (e.g., tokens) from localStorage/sessionStorage
-    localStorage.removeItem("authToken"); // Adjust based on your auth setup
-    sessionStorage.removeItem("authToken"); // Adjust based on your auth setup
-    
-    // Redirect to login page
-    navigate("/");
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        // Clear authentication data from localStorage/sessionStorage
+        localStorage.removeItem("authToken");
+        sessionStorage.removeItem("authToken");
+  
+        // Redirect to login page
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Error logging out:", error);
+        alert("Failed to log out. Please try again.");
+      });
   };
+  
 
   // Function to create a new product
   const createProduct = async (newProduct) => {
